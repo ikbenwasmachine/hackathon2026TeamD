@@ -7,7 +7,7 @@ import { useCurrentUser } from "../auth/useCurrentUser";
 
 export function CreateAccountPage(): ReactElement {
 	const navigate = useNavigate();
-	const { setStudentId } = useCurrentUser();
+	const { setAccountId, refreshAccounts } = useCurrentUser();
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [role, setRole] = useState<Role>("STUDENT");
@@ -21,9 +21,8 @@ export function CreateAccountPage(): ReactElement {
 		setError(null);
 		try {
 			const account = await createAccount({ name, email, role, dateOfBirth, team, password });
-			if (account.role === "STUDENT") {
-				setStudentId(account.id);
-			}
+			refreshAccounts();
+			setAccountId(account.id);
 			void navigate("/");
 		} catch (err: unknown) {
 			setError(err instanceof Error ? err.message : "Failed to create account");

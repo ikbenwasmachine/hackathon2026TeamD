@@ -23,6 +23,34 @@ export interface CourseDetailDto extends CourseSummaryDto {
     lessons: LessonDto[];
 }
 
+export interface AdminCourseDto {
+    id: string;
+    title: string;
+    description: string;
+    level: CourseLevel;
+    assignments: string[];
+    published: boolean;
+    instructorName: string;
+}
+
+export interface CreateCourseRequestDto {
+    adminId: string;
+    title: string;
+    description: string;
+    level: CourseLevel;
+    assignments: string[];
+    published: boolean;
+}
+
+export interface UpdateCourseRequestDto {
+    adminId: string;
+    title?: string;
+    description?: string;
+    level?: CourseLevel;
+    assignments?: string[];
+    published?: boolean;
+}
+
 export interface CreateAccountRequestDto {
     name: string;
     email: string;

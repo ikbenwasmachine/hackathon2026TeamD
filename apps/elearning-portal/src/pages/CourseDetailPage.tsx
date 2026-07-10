@@ -7,7 +7,8 @@ import { useCurrentUser } from "../auth/useCurrentUser";
 
 export function CourseDetailPage(): ReactElement {
 	const { id } = useParams<{ id: string }>();
-	const { studentId } = useCurrentUser();
+	const { account } = useCurrentUser();
+	const isStudent = account?.role === "STUDENT";
 	const [course, setCourse] = useState<CourseDetailDto | null>(null);
 	const [enrollment, setEnrollment] = useState<EnrollmentDto | null>(null);
 	const [error, setError] = useState<string | null>(null);
@@ -24,24 +25,24 @@ export function CourseDetailPage(): ReactElement {
 	}, [id]);
 
 	useEffect(() => {
-		if (!id || !studentId) {
+		if (!id || !isStudent || !account) {
 			setEnrollment(null);
 			return;
 		}
-		fetchEnrollments(studentId)
+		fetchEnrollments(account.id)
 			.then((enrollments) => {
 				setEnrollment(enrollments.find((item) => item.course.id === id) ?? null);
 			})
 			.catch(() => {
 				setEnrollment(null);
 			});
-	}, [id, studentId]);
+	}, [id, account, isStudent]);
 
 	function handleEnroll(): void {
-		if (!id || !studentId) {
+		if (!id || !isStudent || !account) {
 			return;
 		}
-		enrollInCourse(studentId, id)
+		enrollInCourse(account.id, id)
 			.then(setEnrollment)
 			.catch((err: unknown) => {
 				setError(err instanceof Error ? err.message : "Failed to enroll");
@@ -70,9 +71,9 @@ export function CourseDetailPage(): ReactElement {
 	return (
 		<section>
 			<Link to="/">Back to courses</Link>
+			<span className="badge">{course.level}</span>
 			<h1>{course.title}</h1>
 			<p>{course.description}</p>
-			<p>Level: {course.level}</p>
 			<p>Instructor: {course.instructorName}</p>
 			<h2>Assignments</h2>
 			<ul>
@@ -81,15 +82,25 @@ export function CourseDetailPage(): ReactElement {
 				))}
 			</ul>
 			<h2>Lessons</h2>
-			{studentId && !enrollment ? (
+			{isStudent && !enrollment ? (
 				<button type="button" onClick={handleEnroll}>
 					Enroll in this course
 				</button>
 			) : null}
 			{enrollment ? (
-				<p>
-					Progress: {enrollment.completedLessonIds.length} / {enrollment.totalLessons} lessons completed
-				</p>
+				<>
+					<div className="progress-bar">
+						<div
+							className="progress-bar-fill"
+							style={{
+								width: `${enrollment.totalLessons === 0 ? 0 : Math.round((enrollment.completedLessonIds.length / enrollment.totalLessons) * 100)}%`,
+							}}
+						/>
+					</div>
+					<p>
+						{enrollment.completedLessonIds.length} / {enrollment.totalLessons} lessons completed
+					</p>
+				</>
 			) : null}
 			<ol>
 				{course.lessons.map((lesson) => (

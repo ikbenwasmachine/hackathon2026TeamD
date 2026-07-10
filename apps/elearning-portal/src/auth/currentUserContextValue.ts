@@ -1,8 +1,11 @@
 import { createContext } from "react";
+import type { AccountDto } from "shared-types";
 
 export interface CurrentUserContextValue {
-    studentId: string | null;
-    setStudentId: (id: string) => void;
+    account: AccountDto | null;
+    accounts: AccountDto[];
+    setAccountId: (id: string) => void;
+    refreshAccounts: () => void;
 }
 
 export const CurrentUserContext = createContext<CurrentUserContextValue | undefined>(undefined);

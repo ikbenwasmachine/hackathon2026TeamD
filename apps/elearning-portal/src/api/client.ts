@@ -1,4 +1,13 @@
-import type { AccountDto, CourseDetailDto, CourseSummaryDto, CreateAccountRequestDto, EnrollmentDto } from "shared-types";
+import type {
+    AccountDto,
+    AdminCourseDto,
+    CourseDetailDto,
+    CourseSummaryDto,
+    CreateAccountRequestDto,
+    CreateCourseRequestDto,
+    EnrollmentDto,
+    UpdateCourseRequestDto,
+} from "shared-types";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
@@ -40,6 +49,22 @@ export function createAccount(request: CreateAccountRequestDto): Promise<Account
 
 export function fetchStudents(): Promise<AccountDto[]> {
     return fetchJson<AccountDto[]>("/accounts?role=STUDENT");
+}
+
+export function fetchAccounts(): Promise<AccountDto[]> {
+    return fetchJson<AccountDto[]>("/accounts");
+}
+
+export function fetchAdminCourses(adminId: string): Promise<AdminCourseDto[]> {
+    return fetchJson<AdminCourseDto[]>(`/courses/admin?adminId=${encodeURIComponent(adminId)}`);
+}
+
+export function createCourse(request: CreateCourseRequestDto): Promise<AdminCourseDto> {
+    return postJson<AdminCourseDto>("/courses", request);
+}
+
+export function updateCourse(id: string, request: UpdateCourseRequestDto): Promise<AdminCourseDto> {
+    return patchJson<AdminCourseDto>(`/courses/${id}`, request);
 }
 
 export function fetchEnrollments(studentId: string): Promise<EnrollmentDto[]> {

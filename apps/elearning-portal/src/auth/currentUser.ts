@@ -1,13 +1,13 @@
-const STORAGE_KEY = "elearning:currentStudentId";
+const STORAGE_KEY = "elearning:currentAccountId";
 
-export function getCurrentStudentId(): string | null {
+export function getCurrentAccountId(): string | null {
     return window.localStorage.getItem(STORAGE_KEY);
 }
 
-export function setCurrentStudentId(studentId: string): void {
-    window.localStorage.setItem(STORAGE_KEY, studentId);
+export function setCurrentAccountId(accountId: string): void {
+    window.localStorage.setItem(STORAGE_KEY, accountId);
 }
 
-export function clearCurrentStudentId(): void {
+export function clearCurrentAccountId(): void {
     window.localStorage.removeItem(STORAGE_KEY);
 }
