@@ -3,11 +3,6 @@
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "resolvePackageJsonExports": true,
-    "baseUrl": ".",
-    "paths": {
-      "database": ["../../packages/database/src/index.ts"],
-      "shared-types": ["../../packages/shared-types/src/index.ts"]
-    },
     "esModuleInterop": true,
     "isolatedModules": true,
     "declaration": true,
