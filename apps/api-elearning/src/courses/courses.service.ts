@@ -15,6 +15,7 @@ export class CoursesService {
             id: course.id,
             title: course.title,
             description: course.description,
+            level: course.level,
             instructorName: course.instructor.name,
         }));
     }
@@ -41,6 +42,8 @@ export class CoursesService {
             id: course.id,
             title: course.title,
             description: course.description,
+            level: course.level,
+            assignments: course.assignments,
             instructorName: course.instructor.name,
             lessons,
         };

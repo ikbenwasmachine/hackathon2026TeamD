@@ -33,7 +33,14 @@ export function CourseDetailPage(): ReactElement {
 			<Link to="/">Back to courses</Link>
 			<h1>{course.title}</h1>
 			<p>{course.description}</p>
+			<p>Level: {course.level}</p>
 			<p>Instructor: {course.instructorName}</p>
+			<h2>Assignments</h2>
+			<ul>
+				{course.assignments.map((assignment) => (
+					<li key={assignment}>{assignment}</li>
+				))}
+			</ul>
 			<h2>Lessons</h2>
 			<ol>
 				{course.lessons.map((lesson) => (

@@ -12,6 +12,12 @@ enum Role {
   INSTRUCTOR
 }
 
+enum CourseLevel {
+  JUNIOR
+  MEDIOR
+  SENIOR
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -24,15 +30,17 @@ model User {
 }
 
 model Course {
-  id           String   @id @default(cuid())
+  id           String      @id @default(cuid())
   title        String
   description  String
-  published    Boolean  @default(false)
-  instructor   User     @relation("InstructorCourses", fields: [instructorId], references: [id])
+  level        CourseLevel @default(JUNIOR)
+  assignments  String[]    @default([])
+  published    Boolean     @default(false)
+  instructor   User        @relation("InstructorCourses", fields: [instructorId], references: [id])
   instructorId String
   lessons      Lesson[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 }
 
 model Lesson {

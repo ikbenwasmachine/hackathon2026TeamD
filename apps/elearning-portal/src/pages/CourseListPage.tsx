@@ -28,6 +28,7 @@ export function CourseListPage(): ReactElement {
 					<li key={course.id}>
 						<Link to={`/courses/${course.id}`}>{course.title}</Link>
 						<p>{course.description}</p>
+						<p>Level: {course.level}</p>
 						<p>Instructor: {course.instructorName}</p>
 					</li>
 				))}

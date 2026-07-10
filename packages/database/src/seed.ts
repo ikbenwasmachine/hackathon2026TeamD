@@ -15,11 +15,16 @@ async function main(): Promise<void> {
 
         const course1 = await prisma.course.upsert({
             where: { id: "seed-course-1" },
-            update: {},
+            update: {
+                level: "JUNIOR",
+                assignments: ["Set up a TypeScript project", "Convert a JS file to strict TypeScript"],
+            },
             create: {
                 id: "seed-course-1",
                 title: "Introduction to TypeScript",
                 description: "Learn the fundamentals of TypeScript.",
+                level: "JUNIOR",
+                assignments: ["Set up a TypeScript project", "Convert a JS file to strict TypeScript"],
                 published: true,
                 instructorId: instructor.id,
                 lessons: {
@@ -33,11 +38,16 @@ async function main(): Promise<void> {
 
         const course2 = await prisma.course.upsert({
             where: { id: "seed-course-2" },
-            update: {},
+            update: {
+                level: "MEDIOR",
+                assignments: ["Build a component library", "Implement a form with validation", "Fetch and display API data"],
+            },
             create: {
                 id: "seed-course-2",
                 title: "React Fundamentals",
                 description: "Build interactive UIs with React.",
+                level: "MEDIOR",
+                assignments: ["Build a component library", "Implement a form with validation", "Fetch and display API data"],
                 published: true,
                 instructorId: instructor.id,
                 lessons: {
