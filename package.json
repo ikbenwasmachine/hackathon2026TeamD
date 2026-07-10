@@ -1,13 +1,16 @@
 {
 	"name": "cerios-hackathon",
 	"version": "0.0.0",
+	"private": true,
 	"author": "Ronald Veth - Cerios",
+	"workspaces": ["apps/*", "packages/*"],
 	"scripts": {
-		"compile": "tsc --noEmit",
+		"compile": "npm run compile --workspaces --if-present",
 		"format": "oxfmt",
 		"format:check": "oxfmt --check",
 		"lint": "oxlint --type-aware",
 		"lint:fix": "oxlint --type-aware --fix",
+		"seed": "npm run seed --workspace packages/database",
 		"update-all-packages": "npm-check-updates -u && npm i"
 	},
 	"devDependencies": {

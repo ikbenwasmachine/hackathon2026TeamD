@@ -1,0 +1,21 @@
+{
+	"name": "database",
+	"version": "0.0.0",
+	"private": true,
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"build": "prisma generate && tsc -p tsconfig.json",
+		"compile": "tsc --noEmit",
+		"prisma:generate": "prisma generate",
+		"prisma:migrate": "prisma migrate dev",
+		"seed": "tsx src/seed.ts"
+	},
+	"dependencies": {
+		"@prisma/client": "^6.19.3"
+	},
+	"devDependencies": {
+		"prisma": "^6.19.3",
+		"tsx": "^4.23.0"
+	}
+}
