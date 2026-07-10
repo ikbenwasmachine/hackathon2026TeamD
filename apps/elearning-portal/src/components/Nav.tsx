@@ -4,12 +4,18 @@ import { useCurrentUser } from "../auth/useCurrentUser";
 import { useTheme } from "../theme/useTheme";
 
 export function Nav(): ReactElement {
-	const { account, accounts, setAccountId } = useCurrentUser();
+	const { account, accounts, setAccountId, logout } = useCurrentUser();
 	const { theme, toggleTheme } = useTheme();
 
 	return (
 		<nav>
 			<Link to="/">Home</Link> | <Link to="/courses">Courses</Link> | <Link to="/signup">Create Account</Link>
+			{account?.role === "STUDENT" ? (
+				<>
+					{" "}
+					| <Link to="/badges">Badges</Link>
+				</>
+			) : null}
 			{account?.role === "ADMIN" ? (
 				<>
 					{" "}
@@ -26,6 +32,11 @@ export function Nav(): ReactElement {
 					</option>
 				))}
 			</select>
+			{account ? (
+				<button type="button" className="button-secondary" onClick={logout}>
+					Log out
+				</button>
+			) : null}
 			<button type="button" className="button-secondary" onClick={toggleTheme}>
 				{theme === "light" ? "Dark mode" : "Light mode"}
 			</button>

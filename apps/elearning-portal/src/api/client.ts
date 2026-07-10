@@ -1,6 +1,7 @@
 import type {
     AccountDto,
     AdminCourseDto,
+    BadgeDto,
     CourseDetailDto,
     CourseSummaryDto,
     CreateAccountRequestDto,
@@ -110,4 +111,8 @@ export function toggleLessonCompletion(enrollmentId: string, lessonId: string, c
 
 export function submitLessonQuiz(enrollmentId: string, lessonId: string, answers: number[]): Promise<QuizSubmissionResultDto> {
     return postJson<QuizSubmissionResultDto>(`/enrollments/${enrollmentId}/lessons/${lessonId}/quiz`, { answers });
+}
+
+export function fetchBadges(studentId: string): Promise<BadgeDto[]> {
+    return fetchJson<BadgeDto[]>(`/enrollments/badges?studentId=${encodeURIComponent(studentId)}`);
 }

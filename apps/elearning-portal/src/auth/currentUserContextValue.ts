@@ -6,6 +6,7 @@ export interface CurrentUserContextValue {
     accounts: AccountDto[];
     setAccountId: (id: string) => void;
     refreshAccounts: () => void;
+    logout: () => void;
 }
 
 export const CurrentUserContext = createContext<CurrentUserContextValue | undefined>(undefined);

@@ -3,7 +3,7 @@ import type { ReactElement, ReactNode } from "react";
 import type { AccountDto } from "shared-types";
 import { fetchAccounts } from "../api/client";
 import { CurrentUserContext } from "./currentUserContextValue";
-import { getCurrentAccountId, setCurrentAccountId as persistCurrentAccountId } from "./currentUser";
+import { clearCurrentAccountId, getCurrentAccountId, setCurrentAccountId as persistCurrentAccountId } from "./currentUser";
 
 export function CurrentUserProvider({ children }: { children: ReactNode }): ReactElement {
 	const [accountId, setAccountIdState] = useState<string | null>(() => getCurrentAccountId());
@@ -26,10 +26,15 @@ export function CurrentUserProvider({ children }: { children: ReactNode }): Reac
 		setAccountIdState(id);
 	}
 
+	function logout(): void {
+		clearCurrentAccountId();
+		setAccountIdState(null);
+	}
+
 	const account = accounts.find((candidate) => candidate.id === accountId) ?? null;
 
 	return (
-		<CurrentUserContext.Provider value={{ account, accounts, setAccountId, refreshAccounts: loadAccounts }}>
+		<CurrentUserContext.Provider value={{ account, accounts, setAccountId, refreshAccounts: loadAccounts, logout }}>
 			{children}
 		</CurrentUserContext.Provider>
 	);

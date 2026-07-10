@@ -7,7 +7,11 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import type { EnrollmentDto, QuizSubmissionResultDto } from 'shared-types';
+import type {
+  BadgeDto,
+  EnrollmentDto,
+  QuizSubmissionResultDto,
+} from 'shared-types';
 import { EnrollmentsService } from './enrollments.service';
 import { EnrollDto } from './dto/enroll.dto';
 import { SubmitQuizDto } from './dto/submit-quiz.dto';
@@ -15,7 +19,7 @@ import { ToggleLessonDto } from './dto/toggle-lesson.dto';
 
 @Controller('enrollments')
 export class EnrollmentsController {
-  constructor(private readonly enrollmentsService: EnrollmentsService) { }
+  constructor(private readonly enrollmentsService: EnrollmentsService) {}
 
   @Post()
   enroll(@Body() dto: EnrollDto): Promise<EnrollmentDto> {
@@ -27,6 +31,11 @@ export class EnrollmentsController {
     @Query('studentId') studentId: string,
   ): Promise<EnrollmentDto[]> {
     return this.enrollmentsService.listForStudent(studentId);
+  }
+
+  @Get('badges')
+  getBadges(@Query('studentId') studentId: string): Promise<BadgeDto[]> {
+    return this.enrollmentsService.getBadges(studentId);
   }
 
   @Patch(':id/lessons/:lessonId')

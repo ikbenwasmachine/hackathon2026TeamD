@@ -92,3 +92,11 @@ export interface EnrollmentDto {
     completedLessonIds: string[];
     totalLessons: number;
 }
+
+export interface BadgeDto {
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    earned: boolean;
+}

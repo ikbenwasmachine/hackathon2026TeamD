@@ -4,7 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma, prisma } from 'database';
-import type { EnrollmentDto, QuizSubmissionResultDto } from 'shared-types';
+import type {
+  BadgeDto,
+  EnrollmentDto,
+  QuizSubmissionResultDto,
+} from 'shared-types';
 
 const enrollmentWithCourse = Prisma.validator<Prisma.EnrollmentDefaultArgs>()({
   include: { course: { include: { instructor: true, lessons: true } } },
@@ -110,6 +114,77 @@ export class EnrollmentsService {
       allCorrect,
       enrollment: this.toDto(updated),
     };
+  }
+
+  async getBadges(studentId: string): Promise<BadgeDto[]> {
+    const enrollments = await this.listForStudent(studentId);
+
+    const totalCompletedLessons = enrollments.reduce(
+      (sum, enrollment) => sum + enrollment.completedLessonIds.length,
+      0,
+    );
+    const fullyCompletedCourses = enrollments.filter(
+      (enrollment) =>
+        enrollment.totalLessons > 0 &&
+        enrollment.completedLessonIds.length >= enrollment.totalLessons,
+    ).length;
+    const hasHalfwayCourse = enrollments.some(
+      (enrollment) =>
+        enrollment.totalLessons > 0 &&
+        enrollment.completedLessonIds.length / enrollment.totalLessons >= 0.5,
+    );
+
+    return [
+      {
+        id: 'getting-started',
+        name: 'Getting Started',
+        description: 'Enroll in your first course',
+        icon: '🚀',
+        earned: enrollments.length >= 1,
+      },
+      {
+        id: 'first-lesson',
+        name: 'First Lesson',
+        description: 'Complete your first lesson',
+        icon: '🎯',
+        earned: totalCompletedLessons >= 1,
+      },
+      {
+        id: 'halfway-there',
+        name: 'Halfway There',
+        description: 'Reach 50% completion in a course',
+        icon: '📈',
+        earned: hasHalfwayCourse,
+      },
+      {
+        id: 'on-a-roll',
+        name: 'On a Roll',
+        description: 'Complete 5 lessons in total',
+        icon: '🔥',
+        earned: totalCompletedLessons >= 5,
+      },
+      {
+        id: 'course-complete',
+        name: 'Course Complete',
+        description: 'Finish every lesson in a course',
+        icon: '🏆',
+        earned: fullyCompletedCourses >= 1,
+      },
+      {
+        id: 'course-collector',
+        name: 'Course Collector',
+        description: 'Enroll in 3 different courses',
+        icon: '📚',
+        earned: enrollments.length >= 3,
+      },
+      {
+        id: 'graduate',
+        name: 'Graduate',
+        description: 'Fully complete 2 different courses',
+        icon: '🎓',
+        earned: fullyCompletedCourses >= 2,
+      },
+    ];
   }
 
   private toDto(enrollment: EnrollmentWithCourse): EnrollmentDto {
