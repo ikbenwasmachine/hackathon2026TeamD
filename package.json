@@ -16,14 +16,18 @@
 		"seed": "npm run seed --workspace packages/database",
 		"db:start": "docker compose up -d postgres",
 		"db:stop": "docker compose down",
+		"free-port": "kill-port 3000",
+		"predev:api": "npm run free-port",
 		"dev:api": "npm run start:dev --workspace apps/api-elearning",
 		"dev:portal": "npm run dev --workspace apps/elearning-portal",
+		"predev": "npm run free-port",
 		"dev": "concurrently -n db,api,portal -c blue,green,magenta \"npm run db:start\" \"npm run dev:api\" \"npm run dev:portal\"",
 		"update-all-packages": "npm-check-updates -u && npm i"
 	},
 	"devDependencies": {
 		"@types/node": "^25.9.5",
 		"concurrently": "^9.0.1",
+		"kill-port": "^2.0.1",
 		"npm-check-updates": "^22.2.9",
 		"oxfmt": "^0.53.0",
 		"oxlint": "^1.68.0",

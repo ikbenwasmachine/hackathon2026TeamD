@@ -1,2 +1,3 @@
 export { prisma } from "./client";
-export type { Course, Lesson, PrismaClient, Role, User } from "@prisma/client";
+export { Prisma } from "@prisma/client";
+export type { Course, Enrollment, Lesson, PrismaClient, Role, User } from "@prisma/client";

@@ -2,14 +2,40 @@ import { prisma } from "./client";
 
 async function main(): Promise<void> {
     try {
-        const instructor = await prisma.user.upsert({
-            where: { email: "instructor@example.com" },
+        const admin = await prisma.user.upsert({
+            where: { email: "admin@example.com" },
             update: {},
             create: {
-                email: "instructor@example.com",
+                email: "admin@example.com",
                 passwordHash: "seed-placeholder",
-                name: "Ada Instructor",
-                role: "INSTRUCTOR",
+                name: "Ada Admin",
+                role: "ADMIN",
+            },
+        });
+
+        const student1 = await prisma.user.upsert({
+            where: { email: "grace.student@example.com" },
+            update: {},
+            create: {
+                email: "grace.student@example.com",
+                passwordHash: "seed-placeholder",
+                name: "Grace Student",
+                role: "STUDENT",
+                dateOfBirth: new Date("2000-04-12"),
+                team: "Team Falcon",
+            },
+        });
+
+        const student2 = await prisma.user.upsert({
+            where: { email: "sam.student@example.com" },
+            update: {},
+            create: {
+                email: "sam.student@example.com",
+                passwordHash: "seed-placeholder",
+                name: "Sam Student",
+                role: "STUDENT",
+                dateOfBirth: new Date("2001-09-30"),
+                team: "Team Kestrel",
             },
         });
 
@@ -26,7 +52,7 @@ async function main(): Promise<void> {
                 level: "JUNIOR",
                 assignments: ["Set up a TypeScript project", "Convert a JS file to strict TypeScript"],
                 published: true,
-                instructorId: instructor.id,
+                instructorId: admin.id,
                 lessons: {
                     create: [
                         { title: "Why TypeScript?", content: "Overview of static typing benefits.", order: 1 },
@@ -34,6 +60,7 @@ async function main(): Promise<void> {
                     ],
                 },
             },
+            include: { lessons: true },
         });
 
         const course2 = await prisma.course.upsert({
@@ -49,7 +76,7 @@ async function main(): Promise<void> {
                 level: "MEDIOR",
                 assignments: ["Build a component library", "Implement a form with validation", "Fetch and display API data"],
                 published: true,
-                instructorId: instructor.id,
+                instructorId: admin.id,
                 lessons: {
                     create: [
                         { title: "Components & Props", content: "Composing UI with components.", order: 1 },
@@ -60,7 +87,20 @@ async function main(): Promise<void> {
             },
         });
 
-        console.log(`Seeded instructor ${instructor.email}; courses: ${course1.title}, ${course2.title}`);
+        const firstLessonId = course1.lessons[0]?.id;
+        await prisma.enrollment.upsert({
+            where: { studentId_courseId: { studentId: student1.id, courseId: course1.id } },
+            update: { completedLessonIds: firstLessonId ? [firstLessonId] : [] },
+            create: {
+                studentId: student1.id,
+                courseId: course1.id,
+                completedLessonIds: firstLessonId ? [firstLessonId] : [],
+            },
+        });
+
+        console.log(
+            `Seeded admin ${admin.email}; students: ${student1.email}, ${student2.email}; courses: ${course1.title}, ${course2.title}`,
+        );
     } finally {
         await prisma.$disconnect();
     }
