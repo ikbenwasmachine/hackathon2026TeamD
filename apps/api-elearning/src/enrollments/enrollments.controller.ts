@@ -15,7 +15,7 @@ import { ToggleLessonDto } from './dto/toggle-lesson.dto';
 
 @Controller('enrollments')
 export class EnrollmentsController {
-  constructor(private readonly enrollmentsService: EnrollmentsService) {}
+  constructor(private readonly enrollmentsService: EnrollmentsService) { }
 
   @Post()
   enroll(@Body() dto: EnrollDto): Promise<EnrollmentDto> {
