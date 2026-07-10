@@ -7,9 +7,10 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import type { EnrollmentDto } from 'shared-types';
+import type { EnrollmentDto, QuizSubmissionResultDto } from 'shared-types';
 import { EnrollmentsService } from './enrollments.service';
 import { EnrollDto } from './dto/enroll.dto';
+import { SubmitQuizDto } from './dto/submit-quiz.dto';
 import { ToggleLessonDto } from './dto/toggle-lesson.dto';
 
 @Controller('enrollments')
@@ -35,5 +36,14 @@ export class EnrollmentsController {
     @Body() dto: ToggleLessonDto,
   ): Promise<EnrollmentDto> {
     return this.enrollmentsService.toggleLesson(id, lessonId, dto.completed);
+  }
+
+  @Post(':id/lessons/:lessonId/quiz')
+  submitQuiz(
+    @Param('id') id: string,
+    @Param('lessonId') lessonId: string,
+    @Body() dto: SubmitQuizDto,
+  ): Promise<QuizSubmissionResultDto> {
+    return this.enrollmentsService.submitQuiz(id, lessonId, dto.answers);
   }
 }

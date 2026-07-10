@@ -6,6 +6,7 @@ import type {
     CreateAccountRequestDto,
     CreateCourseRequestDto,
     EnrollmentDto,
+    QuizSubmissionResultDto,
     UpdateCourseRequestDto,
 } from "shared-types";
 
@@ -33,6 +34,13 @@ function patchJson<T>(path: string, body: unknown): Promise<T> {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
     });
+}
+
+async function deleteRequest(path: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}${path}`, { method: "DELETE" });
+    if (!response.ok) {
+        throw new Error(`Request to ${path} failed with status ${response.status}`);
+    }
 }
 
 export function fetchCourses(): Promise<CourseSummaryDto[]> {
@@ -67,6 +75,10 @@ export function updateCourse(id: string, request: UpdateCourseRequestDto): Promi
     return patchJson<AdminCourseDto>(`/courses/${id}`, request);
 }
 
+export function deleteCourse(id: string, adminId: string): Promise<void> {
+    return deleteRequest(`/courses/${id}?adminId=${encodeURIComponent(adminId)}`);
+}
+
 export async function uploadCoursePptx(adminId: string, file: File): Promise<AdminCourseDto> {
     const formData = new FormData();
     formData.append("adminId", adminId);
@@ -94,4 +106,8 @@ export function enrollInCourse(studentId: string, courseId: string): Promise<Enr
 
 export function toggleLessonCompletion(enrollmentId: string, lessonId: string, completed: boolean): Promise<EnrollmentDto> {
     return patchJson<EnrollmentDto>(`/enrollments/${enrollmentId}/lessons/${lessonId}`, { completed });
+}
+
+export function submitLessonQuiz(enrollmentId: string, lessonId: string, answers: number[]): Promise<QuizSubmissionResultDto> {
+    return postJson<QuizSubmissionResultDto>(`/enrollments/${enrollmentId}/lessons/${lessonId}/quiz`, { answers });
 }

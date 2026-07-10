@@ -2,7 +2,9 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Param,
   Patch,
   Post,
@@ -68,5 +70,14 @@ export class CoursesController {
     @Body() dto: UpdateCourseDto,
   ): Promise<AdminCourseDto> {
     return this.coursesService.update(id, dto);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  remove(
+    @Param('id') id: string,
+    @Query('adminId') adminId: string,
+  ): Promise<void> {
+    return this.coursesService.delete(id, adminId);
   }
 }

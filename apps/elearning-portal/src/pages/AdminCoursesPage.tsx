@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent, ReactElement } from "react";
 import type { AdminCourseDto, CourseLevel } from "shared-types";
-import { createCourse, fetchAdminCourses, updateCourse, uploadCoursePptx } from "../api/client";
+import { createCourse, deleteCourse, fetchAdminCourses, updateCourse, uploadCoursePptx } from "../api/client";
 import { useCurrentUser } from "../auth/useCurrentUser";
 
 const COURSE_LEVELS: CourseLevel[] = ["JUNIOR", "MEDIOR", "SENIOR"];
@@ -96,6 +96,7 @@ export function AdminCoursesPage(): ReactElement {
 	const { account } = useCurrentUser();
 	const [courses, setCourses] = useState<AdminCourseDto[]>([]);
 	const [error, setError] = useState<string | null>(null);
+	const [successMessage, setSuccessMessage] = useState<string | null>(null);
 	const [pptxFile, setPptxFile] = useState<File | null>(null);
 	const [uploading, setUploading] = useState(false);
 
@@ -105,6 +106,14 @@ export function AdminCoursesPage(): ReactElement {
 			.catch((err: unknown) => {
 				setError(err instanceof Error ? err.message : "Failed to load courses");
 			});
+	}
+
+	function showSuccess(message: string): void {
+		setError(null);
+		setSuccessMessage(message);
+		window.setTimeout(() => {
+			setSuccessMessage(null);
+		}, 4000);
 	}
 
 	useEffect(() => {
@@ -136,6 +145,7 @@ export function AdminCoursesPage(): ReactElement {
 		})
 			.then(() => {
 				loadCourses(account.id);
+				showSuccess(`Course "${form.title}" was created successfully.`);
 			})
 			.catch((err: unknown) => {
 				setError(err instanceof Error ? err.message : "Failed to create course");
@@ -156,9 +166,27 @@ export function AdminCoursesPage(): ReactElement {
 		})
 			.then(() => {
 				loadCourses(account.id);
+				showSuccess(`Changes to "${form.title}" were saved successfully.`);
 			})
 			.catch((err: unknown) => {
 				setError(err instanceof Error ? err.message : "Failed to update course");
+			});
+	}
+
+	function handleDelete(courseId: string, title: string): void {
+		if (!account) {
+			return;
+		}
+		if (!window.confirm(`Delete the course "${title}"? This cannot be undone.`)) {
+			return;
+		}
+		deleteCourse(courseId, account.id)
+			.then(() => {
+				loadCourses(account.id);
+				showSuccess(`Course "${title}" was deleted.`);
+			})
+			.catch((err: unknown) => {
+				setError(err instanceof Error ? err.message : "Failed to delete course");
 			});
 	}
 
@@ -188,6 +216,7 @@ export function AdminCoursesPage(): ReactElement {
 		<section>
 			<h1>Admin: Manage Courses</h1>
 			{error ? <p role="alert">{error}</p> : null}
+			{successMessage ? <p className="success-message">{successMessage}</p> : null}
 
 			<h2>Create a new course</h2>
 			<CourseForm initial={EMPTY_FORM} submitLabel="Create course" onSubmit={handleCreate} />
@@ -217,6 +246,9 @@ export function AdminCoursesPage(): ReactElement {
 							submitLabel="Save changes"
 							onSubmit={(form) => handleUpdate(course.id, form)}
 						/>
+						<button type="button" className="button-danger" onClick={() => handleDelete(course.id, course.title)}>
+							Delete course
+						</button>
 					</li>
 				))}
 			</ul>

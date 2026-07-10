@@ -2,12 +2,19 @@ export type CourseLevel = "JUNIOR" | "MEDIOR" | "SENIOR";
 
 export type Role = "STUDENT" | "ADMIN";
 
+export interface QuizQuestionDto {
+    id: string;
+    question: string;
+    options: string[];
+}
+
 export interface LessonDto {
     id: string;
     title: string;
     content: string;
     videoUrl: string | null;
     order: number;
+    questions: QuizQuestionDto[];
 }
 
 export interface CourseSummaryDto {
@@ -21,6 +28,16 @@ export interface CourseSummaryDto {
 export interface CourseDetailDto extends CourseSummaryDto {
     assignments: string[];
     lessons: LessonDto[];
+}
+
+export interface QuizSubmissionRequestDto {
+    answers: number[];
+}
+
+export interface QuizSubmissionResultDto {
+    correctness: boolean[];
+    allCorrect: boolean;
+    enrollment: EnrollmentDto;
 }
 
 export interface AdminCourseDto {

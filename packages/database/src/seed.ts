@@ -53,14 +53,48 @@ async function main(): Promise<void> {
                 assignments: ["Set up a TypeScript project", "Convert a JS file to strict TypeScript"],
                 published: true,
                 instructorId: admin.id,
+            },
+        });
+
+        await prisma.lesson.deleteMany({ where: { courseId: course1.id } });
+        await prisma.course.update({
+            where: { id: course1.id },
+            data: {
                 lessons: {
                     create: [
-                        { title: "Why TypeScript?", content: "Overview of static typing benefits.", order: 1 },
-                        { title: "Basic Types", content: "Strings, numbers, booleans, arrays.", order: 2 },
+                        {
+                            title: "Why TypeScript?",
+                            content: "Overview of static typing benefits.",
+                            order: 1,
+                            questions: {
+                                create: [
+                                    {
+                                        question: "What is a key benefit of TypeScript mentioned in this lesson?",
+                                        options: ["Static typing", "Slower runtime", "No compiler needed", "Removes all bugs"],
+                                        correctOptionIndex: 0,
+                                        order: 1,
+                                    },
+                                ],
+                            },
+                        },
+                        {
+                            title: "Basic Types",
+                            content: "Strings, numbers, booleans, arrays.",
+                            order: 2,
+                            questions: {
+                                create: [
+                                    {
+                                        question: "Which of the following is a basic TypeScript type covered in this lesson?",
+                                        options: ["Promise", "string", "Symbol", "WeakMap"],
+                                        correctOptionIndex: 1,
+                                        order: 1,
+                                    },
+                                ],
+                            },
+                        },
                     ],
                 },
             },
-            include: { lessons: true },
         });
 
         const course2 = await prisma.course.upsert({
@@ -77,17 +111,71 @@ async function main(): Promise<void> {
                 assignments: ["Build a component library", "Implement a form with validation", "Fetch and display API data"],
                 published: true,
                 instructorId: admin.id,
+            },
+        });
+
+        await prisma.lesson.deleteMany({ where: { courseId: course2.id } });
+        await prisma.course.update({
+            where: { id: course2.id },
+            data: {
                 lessons: {
                     create: [
-                        { title: "Components & Props", content: "Composing UI with components.", order: 1 },
-                        { title: "State & Hooks", content: "Managing state with useState/useEffect.", order: 2 },
-                        { title: "Handling Events", content: "Responding to user interaction.", order: 3 },
+                        {
+                            title: "Components & Props",
+                            content: "Composing UI with components.",
+                            order: 1,
+                            questions: {
+                                create: [
+                                    {
+                                        question: "What do you use to compose UI in React, as covered in this lesson?",
+                                        options: ["Components", "Middlewares", "Migrations", "Containers"],
+                                        correctOptionIndex: 0,
+                                        order: 1,
+                                    },
+                                ],
+                            },
+                        },
+                        {
+                            title: "State & Hooks",
+                            content: "Managing state with useState/useEffect.",
+                            order: 2,
+                            questions: {
+                                create: [
+                                    {
+                                        question: "Which hooks are mentioned in this lesson for managing state and effects?",
+                                        options: ["useState only", "useEffect only", "Both useState and useEffect", "Neither"],
+                                        correctOptionIndex: 2,
+                                        order: 1,
+                                    },
+                                ],
+                            },
+                        },
+                        {
+                            title: "Handling Events",
+                            content: "Responding to user interaction.",
+                            order: 3,
+                            questions: {
+                                create: [
+                                    {
+                                        question: "What does this lesson focus on?",
+                                        options: ["Responding to user interaction", "Server-side rendering", "Database queries", "CSS animations"],
+                                        correctOptionIndex: 0,
+                                        order: 1,
+                                    },
+                                ],
+                            },
+                        },
                     ],
                 },
             },
         });
 
-        const firstLessonId = course1.lessons[0]?.id;
+        const course1Lessons = await prisma.lesson.findMany({
+            where: { courseId: course1.id },
+            orderBy: { order: "asc" },
+        });
+
+        const firstLessonId = course1Lessons[0]?.id;
         await prisma.enrollment.upsert({
             where: { studentId_courseId: { studentId: student1.id, courseId: course1.id } },
             update: { completedLessonIds: firstLessonId ? [firstLessonId] : [] },

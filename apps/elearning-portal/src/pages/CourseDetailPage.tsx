@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { ReactElement } from "react";
 import { Link, useParams } from "react-router-dom";
 import type { CourseDetailDto, EnrollmentDto } from "shared-types";
-import { enrollInCourse, fetchCourse, fetchEnrollments, toggleLessonCompletion } from "../api/client";
+import { enrollInCourse, fetchCourse, fetchEnrollments } from "../api/client";
 import { useCurrentUser } from "../auth/useCurrentUser";
 
 export function CourseDetailPage(): ReactElement {
@@ -46,17 +46,6 @@ export function CourseDetailPage(): ReactElement {
 			.then(setEnrollment)
 			.catch((err: unknown) => {
 				setError(err instanceof Error ? err.message : "Failed to enroll");
-			});
-	}
-
-	function handleToggleLesson(lessonId: string, completed: boolean): void {
-		if (!enrollment) {
-			return;
-		}
-		toggleLessonCompletion(enrollment.id, lessonId, completed)
-			.then(setEnrollment)
-			.catch((err: unknown) => {
-				setError(err instanceof Error ? err.message : "Failed to update lesson progress");
 			});
 	}
 
@@ -105,17 +94,9 @@ export function CourseDetailPage(): ReactElement {
 			<ol>
 				{course.lessons.map((lesson) => (
 					<li key={lesson.id}>
-						<h3>{lesson.title}</h3>
-						<p>{lesson.content}</p>
-						{enrollment ? (
-							<label>
-								<input
-									type="checkbox"
-									checked={enrollment.completedLessonIds.includes(lesson.id)}
-									onChange={(event) => handleToggleLesson(lesson.id, event.target.checked)}
-								/>
-								Completed
-							</label>
+						<Link to={`/courses/${course.id}/lessons/${lesson.id}`}>{lesson.title}</Link>
+						{enrollment?.completedLessonIds.includes(lesson.id) ? (
+							<span className="quiz-result-correct"> ✓ Completed</span>
 						) : null}
 					</li>
 				))}

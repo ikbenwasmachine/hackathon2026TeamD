@@ -51,7 +51,7 @@ model Enrollment {
   id                 String   @id @default(cuid())
   student            User     @relation(fields: [studentId], references: [id])
   studentId          String
-  course             Course   @relation(fields: [courseId], references: [id])
+  course             Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   courseId           String
   completedLessonIds String[] @default([])
   createdAt          DateTime @default(now())
@@ -61,13 +61,26 @@ model Enrollment {
 }
 
 model Lesson {
-  id        String   @id @default(cuid())
+  id        String         @id @default(cuid())
   title     String
   content   String
   videoUrl  String?
   order     Int
-  course    Course   @relation(fields: [courseId], references: [id])
+  course    Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
   courseId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  questions QuizQuestion[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+model QuizQuestion {
+  id                 String   @id @default(cuid())
+  lesson             Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lessonId           String
+  question           String
+  options            String[]
+  correctOptionIndex Int
+  order              Int
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }

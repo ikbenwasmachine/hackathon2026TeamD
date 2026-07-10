@@ -7,6 +7,7 @@ import { CourseDetailPage } from "./pages/CourseDetailPage";
 import { CourseListPage } from "./pages/CourseListPage";
 import { CreateAccountPage } from "./pages/CreateAccountPage";
 import { HomePage } from "./pages/HomePage";
+import { LessonPage } from "./pages/LessonPage";
 import { ThemeProvider } from "./theme/ThemeProvider";
 
 function App(): ReactElement {
@@ -18,6 +19,7 @@ function App(): ReactElement {
 					<Route path="/" element={<HomePage />} />
 					<Route path="/courses" element={<CourseListPage />} />
 					<Route path="/courses/:id" element={<CourseDetailPage />} />
+					<Route path="/courses/:courseId/lessons/:lessonId" element={<LessonPage />} />
 					<Route path="/signup" element={<CreateAccountPage />} />
 					<Route path="/admin" element={<AdminCoursesPage />} />
 				</Routes>

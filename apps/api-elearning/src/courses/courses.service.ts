@@ -36,7 +36,13 @@ export class CoursesService {
   async findById(id: string): Promise<CourseDetailDto> {
     const course = await prisma.course.findUnique({
       where: { id },
-      include: { instructor: true, lessons: { orderBy: { order: 'asc' } } },
+      include: {
+        instructor: true,
+        lessons: {
+          orderBy: { order: 'asc' },
+          include: { questions: { orderBy: { order: 'asc' } } },
+        },
+      },
     });
 
     if (!course || !course.published) {
@@ -49,6 +55,11 @@ export class CoursesService {
       content: lesson.content,
       videoUrl: lesson.videoUrl,
       order: lesson.order,
+      questions: lesson.questions.map((question) => ({
+        id: question.id,
+        question: question.question,
+        options: question.options,
+      })),
     }));
 
     return {
@@ -153,6 +164,17 @@ export class CoursesService {
     });
 
     return this.toAdminDto(course);
+  }
+
+  async delete(id: string, adminId: string): Promise<void> {
+    await this.assertAdmin(adminId);
+
+    const existing = await prisma.course.findUnique({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`Course ${id} not found`);
+    }
+
+    await prisma.course.delete({ where: { id } });
   }
 
   private async assertAdmin(adminId: string): Promise<void> {

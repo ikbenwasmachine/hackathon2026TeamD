@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma, prisma } from 'database';
-import type { EnrollmentDto } from 'shared-types';
+import type { EnrollmentDto, QuizSubmissionResultDto } from 'shared-types';
 
 const enrollmentWithCourse = Prisma.validator<Prisma.EnrollmentDefaultArgs>()({
   include: { course: { include: { instructor: true, lessons: true } } },
@@ -56,6 +60,56 @@ export class EnrollmentsService {
     });
 
     return this.toDto(updated);
+  }
+
+  async submitQuiz(
+    enrollmentId: string,
+    lessonId: string,
+    answers: number[],
+  ): Promise<QuizSubmissionResultDto> {
+    const enrollment = await prisma.enrollment.findUnique({
+      where: { id: enrollmentId },
+    });
+
+    if (!enrollment) {
+      throw new NotFoundException(`Enrollment ${enrollmentId} not found`);
+    }
+
+    const lesson = await prisma.lesson.findUnique({
+      where: { id: lessonId },
+      include: { questions: { orderBy: { order: 'asc' } } },
+    });
+
+    if (!lesson || lesson.courseId !== enrollment.courseId) {
+      throw new NotFoundException(`Lesson ${lessonId} not found`);
+    }
+
+    if (answers.length !== lesson.questions.length) {
+      throw new BadRequestException(
+        `Expected ${lesson.questions.length} answers, received ${answers.length}`,
+      );
+    }
+
+    const correctness = lesson.questions.map(
+      (question, index) => question.correctOptionIndex === answers[index],
+    );
+    const allCorrect = correctness.every(Boolean);
+
+    const nextCompleted = allCorrect
+      ? Array.from(new Set([...enrollment.completedLessonIds, lessonId]))
+      : enrollment.completedLessonIds;
+
+    const updated = await prisma.enrollment.update({
+      where: { id: enrollmentId },
+      data: { completedLessonIds: nextCompleted },
+      ...enrollmentWithCourse,
+    });
+
+    return {
+      correctness,
+      allCorrect,
+      enrollment: this.toDto(updated),
+    };
   }
 
   private toDto(enrollment: EnrollmentWithCourse): EnrollmentDto {
