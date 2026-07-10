@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -6,7 +7,10 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import type {
   AdminCourseDto,
   CourseDetailDto,
@@ -35,6 +39,22 @@ export class CoursesController {
   @Post()
   create(@Body() dto: CreateCourseDto): Promise<AdminCourseDto> {
     return this.coursesService.create(dto);
+  }
+
+  @Post('upload-pptx')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadPptx(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('adminId') adminId: string,
+  ): Promise<AdminCourseDto> {
+    if (!file) {
+      throw new BadRequestException('A .pptx file is required');
+    }
+    return this.coursesService.createFromPptx(
+      adminId,
+      file.originalname,
+      file.buffer,
+    );
   }
 
   @Get(':id')

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -12,6 +13,7 @@ import type {
 } from 'shared-types';
 import type { CreateCourseDto } from './dto/create-course.dto';
 import type { UpdateCourseDto } from './dto/update-course.dto';
+import { parsePptx } from './pptx-parser';
 
 @Injectable()
 export class CoursesService {
@@ -82,6 +84,47 @@ export class CoursesService {
         assignments: dto.assignments,
         published: dto.published,
         instructorId: dto.adminId,
+      },
+      include: { instructor: true },
+    });
+
+    return this.toAdminDto(course);
+  }
+
+  async createFromPptx(
+    adminId: string,
+    filename: string,
+    buffer: Buffer,
+  ): Promise<AdminCourseDto> {
+    await this.assertAdmin(adminId);
+
+    const slides = await parsePptx(buffer);
+    if (slides.length === 0) {
+      throw new BadRequestException(
+        'No slides were found in this PowerPoint file',
+      );
+    }
+
+    const title = filename
+      .replace(/\.pptx$/i, '')
+      .replace(/[_-]+/g, ' ')
+      .trim();
+
+    const course = await prisma.course.create({
+      data: {
+        title: title || 'Imported course',
+        description: `Imported from ${filename}. Edit this description in the admin screen.`,
+        level: 'JUNIOR',
+        assignments: [],
+        published: false,
+        instructorId: adminId,
+        lessons: {
+          create: slides.map((slide, index) => ({
+            title: slide.title || `Slide ${index + 1}`,
+            content: slide.content,
+            order: index + 1,
+          })),
+        },
       },
       include: { instructor: true },
     });

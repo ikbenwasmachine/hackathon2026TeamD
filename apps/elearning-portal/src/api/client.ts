@@ -67,6 +67,23 @@ export function updateCourse(id: string, request: UpdateCourseRequestDto): Promi
     return patchJson<AdminCourseDto>(`/courses/${id}`, request);
 }
 
+export async function uploadCoursePptx(adminId: string, file: File): Promise<AdminCourseDto> {
+    const formData = new FormData();
+    formData.append("adminId", adminId);
+    formData.append("file", file);
+
+    const response = await fetch(`${API_BASE_URL}/courses/upload-pptx`, {
+        method: "POST",
+        body: formData,
+    });
+
+    if (!response.ok) {
+        throw new Error(`Request to /courses/upload-pptx failed with status ${response.status}`);
+    }
+
+    return response.json() as Promise<AdminCourseDto>;
+}
+
 export function fetchEnrollments(studentId: string): Promise<EnrollmentDto[]> {
     return fetchJson<EnrollmentDto[]>(`/enrollments?studentId=${encodeURIComponent(studentId)}`);
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import type { ReactElement } from "react";
+import type { ChangeEvent, ReactElement } from "react";
 import type { AdminCourseDto, CourseLevel } from "shared-types";
-import { createCourse, fetchAdminCourses, updateCourse } from "../api/client";
+import { createCourse, fetchAdminCourses, updateCourse, uploadCoursePptx } from "../api/client";
 import { useCurrentUser } from "../auth/useCurrentUser";
 
 const COURSE_LEVELS: CourseLevel[] = ["JUNIOR", "MEDIOR", "SENIOR"];
@@ -96,6 +96,8 @@ export function AdminCoursesPage(): ReactElement {
 	const { account } = useCurrentUser();
 	const [courses, setCourses] = useState<AdminCourseDto[]>([]);
 	const [error, setError] = useState<string | null>(null);
+	const [pptxFile, setPptxFile] = useState<File | null>(null);
+	const [uploading, setUploading] = useState(false);
 
 	function loadCourses(adminId: string): void {
 		fetchAdminCourses(adminId)
@@ -160,6 +162,28 @@ export function AdminCoursesPage(): ReactElement {
 			});
 	}
 
+	function handlePptxFileChange(event: ChangeEvent<HTMLInputElement>): void {
+		setPptxFile(event.target.files?.[0] ?? null);
+	}
+
+	function handlePptxUpload(): void {
+		if (!account || !pptxFile) {
+			return;
+		}
+		setUploading(true);
+		uploadCoursePptx(account.id, pptxFile)
+			.then(() => {
+				setPptxFile(null);
+				loadCourses(account.id);
+			})
+			.catch((err: unknown) => {
+				setError(err instanceof Error ? err.message : "Failed to import PowerPoint file");
+			})
+			.finally(() => {
+				setUploading(false);
+			});
+	}
+
 	return (
 		<section>
 			<h1>Admin: Manage Courses</h1>
@@ -167,6 +191,16 @@ export function AdminCoursesPage(): ReactElement {
 
 			<h2>Create a new course</h2>
 			<CourseForm initial={EMPTY_FORM} submitLabel="Create course" onSubmit={handleCreate} />
+
+			<h2>Import from PowerPoint</h2>
+			<p>Upload a .pptx file to create a new (unpublished) course with one lesson per slide.</p>
+			<label>
+				PowerPoint file
+				<input type="file" accept=".pptx" onChange={handlePptxFileChange} />
+			</label>
+			<button type="button" disabled={!pptxFile || uploading} onClick={handlePptxUpload}>
+				{uploading ? "Importing..." : "Import course"}
+			</button>
 
 			<h2>Existing courses</h2>
 			<ul>
