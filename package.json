@@ -2,7 +2,7 @@
 	"name": "cerios-hackathon",
 	"version": "0.0.0",
 	"private": true,
-	"author": "Ronald Veth - Cerios",
+	"author": "D-bomb - team D - Cerios",
 	"workspaces": ["apps/*", "packages/*"],
 	"scripts": {
 		"compile": "npm run compile --workspaces --if-present",
