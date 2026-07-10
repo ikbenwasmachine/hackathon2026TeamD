@@ -3,7 +3,10 @@
 	"version": "0.0.0",
 	"private": true,
 	"author": "D-bomb - team D - Cerios",
-	"workspaces": ["apps/*", "packages/*"],
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
 	"scripts": {
 		"compile": "npm run compile --workspaces --if-present",
 		"format": "oxfmt",
@@ -19,7 +22,7 @@
 		"update-all-packages": "npm-check-updates -u && npm i"
 	},
 	"devDependencies": {
-		"@types/node": "^25.9.1",
+		"@types/node": "^25.9.5",
 		"concurrently": "^9.0.1",
 		"npm-check-updates": "^22.2.9",
 		"oxfmt": "^0.53.0",
