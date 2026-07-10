@@ -2,8 +2,11 @@
 	"name": "cerios-hackathon",
 	"version": "0.0.0",
 	"private": true,
-	"author": "Ronald Veth - Cerios",
-	"workspaces": ["apps/*", "packages/*"],
+	"author": "D-bomb - team D - Cerios",
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
 	"scripts": {
 		"compile": "npm run compile --workspaces --if-present",
 		"format": "oxfmt",
@@ -11,10 +14,16 @@
 		"lint": "oxlint --type-aware",
 		"lint:fix": "oxlint --type-aware --fix",
 		"seed": "npm run seed --workspace packages/database",
+		"db:start": "docker compose up -d postgres",
+		"db:stop": "docker compose down",
+		"dev:api": "npm run start:dev --workspace apps/api-elearning",
+		"dev:portal": "npm run dev --workspace apps/elearning-portal",
+		"dev": "concurrently -n db,api,portal -c blue,green,magenta \"npm run db:start\" \"npm run dev:api\" \"npm run dev:portal\"",
 		"update-all-packages": "npm-check-updates -u && npm i"
 	},
 	"devDependencies": {
-		"@types/node": "^25.9.1",
+		"@types/node": "^25.9.5",
+		"concurrently": "^9.0.1",
 		"npm-check-updates": "^22.2.9",
 		"oxfmt": "^0.53.0",
 		"oxlint": "^1.68.0",
